@@ -2,10 +2,10 @@
 import React from 'react'
 
 const Messsage = ({message}) => {
-  if( message?.message?.conversation == null && message?.message?.extendedTextMessage?.text ==null ) return
-  const fromMe = message.key?.fromMe;
+  console.log(message)
+  const fromMe = message.fromMe;
   const messageClassName = fromMe ? 'chat-end' : 'chat-start';
-  const messageText = message?.message?.conversation || message?.message?.extendedTextMessage?.text;
+  const messageText = message.text;
   return (
         <div className={`chat ${messageClassName}`}>
   <div className="chat-image avatar">

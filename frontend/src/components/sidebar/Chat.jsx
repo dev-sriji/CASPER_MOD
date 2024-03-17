@@ -3,10 +3,10 @@
 import React from "react";
 import useChat from "../../BearModule/UseChat";
 
-const Chat = ({chat}) => {
+const Chat = ({chat,name}) => {
   const { selectedChat, setSelectedChat } = useChat();
 
-  const isSelected = selectedChat?.remoteJid === chat.remoteJid;
+  const isSelected = selectedChat?.chat === chat.chat;
 
   return (
     <div>
@@ -23,7 +23,7 @@ const Chat = ({chat}) => {
           </div>
         </div>
         <b>
-          {chat.pushNames}
+          {chat.chat}
         </b>
       </div>
       <div className="devider my-0 py-0 h-1" />

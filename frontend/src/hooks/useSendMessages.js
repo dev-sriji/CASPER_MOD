@@ -16,7 +16,7 @@ const useSendMessages = () => {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  chat: selectedChat.remoteJid,
+                  chat: selectedChat.chat,
                   payload: message
                 }),
             });

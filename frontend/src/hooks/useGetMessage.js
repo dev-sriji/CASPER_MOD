@@ -19,11 +19,11 @@ const useGetMessages = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            remoteJid: selectedChat.remoteJid,
+            chat: selectedChat?.chat,
           }),
         });
         const data = await res.json();
-        await console.log(await data)
+        // await console.log(await data)
         if (data.error) {
           throw new Error(data.error);
         }
@@ -35,10 +35,10 @@ const useGetMessages = () => {
       }
     };
 
-    if (selectedChat?.remoteJid) {
+    if (selectedChat?.chat) {
       getMessages();
     }
-  }, [selectedChat?.remoteJid, setMessages]);
+  }, [selectedChat?.chat, setMessages]);
 
   return { messages, loading };
 };
