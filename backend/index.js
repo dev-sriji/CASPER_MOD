@@ -1,3 +1,5 @@
+//index.js
+
 import express from "express";
 import {
   useMultiFileAuthState,
@@ -7,17 +9,16 @@ import {
 import { connectToMongoDB } from "./db/connectToMongoDB.js";
 import Config from "./config.js";
 import cors from "cors";
-const app = express();
+import {app, io, server} from './socketio/socket.js'
 app.use(express.json());
 app.use(cors());
 import Message from "./models/message-model.js";
 
 const PORT = Config.PORT || 8080;
-const WS_PORT = Config.WS_PORT || 8080;
 
 // Function to connect to WhatsApp
 async function connectToWhatsApp() {
-  await app.listen(PORT, () => {
+  await server.listen(PORT, () => {
     connectToMongoDB();
     console.log("Server Is Running On ", PORT);
   });
@@ -33,7 +34,7 @@ async function connectToWhatsApp() {
     if (qr) {
       console.log("QR Code Generated...");
       console.log(qr);
-      io.emit("whatsapp.qr", qr);
+      // io.emit("whatsapp.qr", qr);
     }
 
     if (connection === "close") {
@@ -96,6 +97,7 @@ async function connectToWhatsApp() {
         false,
         itself: messages[0],
     };
+    // console.log(m);
     handleMessage(m);
 });
 
@@ -115,7 +117,6 @@ app.post("/sendMessage", (req, res) => {
   });
 
   app.post("/getMessages", async (req, res) => {
-    console.log("ok994");
     try {
       const requestedChat = req.body.chat;
       if (!requestedChat) {
@@ -123,8 +124,7 @@ app.post("/sendMessage", (req, res) => {
       }
 
       const mess = await Message.find({ chat: requestedChat })
-        .sort({ updatedAt: 1 }) 
-        .limit(20);
+        .sort({ updatedAt: 1 });
 
       if (!mess || mess.length === 0) {
         return res.status(200).json({});
@@ -172,9 +172,9 @@ app.post("/sendMessage", (req, res) => {
 
   async function handleMessage(m) {
     // console.log(m)
-    const isGroup = m?.key?.remoteJid?.endsWith("@g.us") ? true : false;
-    if (isGroup) return;
+    if (m.isGroup) return;
     await saveMessage(m);
+    io.emit('recievedMessage',m)
   }
   const saveMessage = async (messageData) => {
     try {

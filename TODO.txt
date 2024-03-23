@@ -6,3 +6,12 @@ BG Link :
 https://i.vimeocdn.com/video/969983360-08be34661c89bc975fc7d83249e9bad02be4314761b59aaf7b0b8cc089ba9357-d_640x360.jpg
 https://i.pinimg.com/originals/d4/f5/d7/d4f5d7654bda4c9842291069b0551f7b.jpg
 https://e1.pxfuel.com/desktop-wallpaper/596/934/desktop-wallpaper-omen-valorant-pc-games-2021-ultra-valorant-pc-thumbnail.jpg
+
+
+
+
+<div className="lg:tooltip" data-tip={message.createdAt}>
+        <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
+          {formattedTimeStamp}
+        </div>
+      </div>
