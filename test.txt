@@ -1,0 +1,108 @@
+//delete Messagew
+
+{
+    name: '☘️ i.t.х.me 🔥SRIJI⚔️',
+    chat: '919744504738@s.whatsapp.net',
+    sender: '919744504738@s.whatsapp.net',
+    isGroup: false,
+    isDm: true,
+    text: undefined,
+    key: '7890C3292C273A3A30DF450D99774D5A',
+    fromMe: false,
+    quoted: { log: undefined, text: '', sender: '', tagged: ''
+    },
+    replyingTo: '',
+    itself: {
+      key: {
+        remoteJid: '919744504738@s.whatsapp.net',
+        fromMe: false,
+        id: '7890C3292C273A3A30DF450D99774D5A',
+        participant: undefined
+        },
+      messageTimestamp: 1711212346,
+      pushName: '☘️ i.t.х.me 🔥\n\nS\nR\nI\nJ\nI\n⚔️',
+      broadcast: false,
+      message: Message {
+        protocolMessage: [ProtocolMessage
+            ],
+        messageContextInfo: [MessageContextInfo
+            ]
+        }
+    }
+}
+
+
+
+// image sent 
+
+{
+  key: {
+    remoteJid: '919744504738@s.whatsapp.net',
+    fromMe: false,
+    id: '5E00AA8F9268C3EEBF9F521B92CC4695',
+    participant: undefined
+  },
+  messageTimestamp: 1711212739,
+  pushName: '☘️ i.t.х.me 🔥\n\nS\nR\nI\nJ\nI\n⚔️',
+  broadcast: false,
+  message: Message {
+    imageMessage: ImageMessage {
+      interactiveAnnotations: [],
+      scanLengths: [Array],
+      annotations: [],
+      url: 'https://mmg.whatsapp.net/v/t62.7118-24/40754841_1150180072554615_8568952511235401772_n.enc?ccb=11-4&oh=01_AdTiQx1hYrtkBc9nLQrkaSlpt6hHejoxGSGHpZAgtwlgfg&oe=6626667F&_nc_sid=5e03e0&mms3=true',
+      mimetype: 'image/jpeg',
+      fileSha256: [Uint8Array],
+      fileLength: [Long],
+      height: 1280,
+      width: 720,
+      mediaKey: [Uint8Array],
+      fileEncSha256: [Uint8Array],
+      directPath: '/v/t62.7118-24/40754841_1150180072554615_8568952511235401772_n.enc?ccb=11-4&oh=01_AdTiQx1hYrtkBc9nLQrkaSlpt6hHejoxGSGHpZAgtwlgfg&oe=6626667F&_nc_sid=5e03e0',
+      mediaKeyTimestamp: [Long],
+      jpegThumbnail: [Uint8Array],
+      scansSidecar: [Uint8Array],
+      midQualityFileSha256: [Uint8Array]
+    },
+    messageContextInfo: MessageContextInfo {
+      deviceListMetadata: [DeviceListMetadata],
+      deviceListMetadataVersion: 2
+    }
+  }
+}
+
+//video 
+{
+  key: {
+    remoteJid: '919744504738@s.whatsapp.net',
+    fromMe: false,
+    id: '50EDF3912F55E7FF8193912DC69DE728',
+    participant: undefined
+  },
+  messageTimestamp: 1711212892,
+  pushName: '☘️ i.t.х.me 🔥\n\nS\nR\nI\nJ\nI\n⚔️',
+  broadcast: false,
+  message: Message {
+    videoMessage: VideoMessage {
+      interactiveAnnotations: [],
+      annotations: [],
+      url: 'https://mmg.whatsapp.net/v/t62.7161-24/56334555_1574524780115209_5821535283216870465_n.enc?ccb=11-4&oh=01_AdRDD3JmQVtspsu5Us7qBZL2cXqAzqcebBWoLiMeUQNBJA&oe=662686F4&_nc_sid=5e03e0&mms3=true',
+      mimetype: 'video/mp4',
+      fileSha256: [Uint8Array],
+      fileLength: [Long],
+      seconds: 1,
+      mediaKey: [Uint8Array],
+      height: 832,
+      width: 480,
+      fileEncSha256: [Uint8Array],
+      directPath: '/v/t62.7161-24/56334555_1574524780115209_5821535283216870465_n.enc?ccb=11-4&oh=01_AdRDD3JmQVtspsu5Us7qBZL2cXqAzqcebBWoLiMeUQNBJA&oe=662686F4&_nc_sid=5e03e0',
+      mediaKeyTimestamp: [Long],
+      jpegThumbnail: [Uint8Array],
+      streamingSidecar: [Uint8Array]
+    },
+    messageContextInfo: MessageContextInfo {
+      deviceListMetadata: [DeviceListMetadata],
+      deviceListMetadataVersion: 2
+    }
+  }
+}

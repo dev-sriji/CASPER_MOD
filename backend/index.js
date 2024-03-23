@@ -1,5 +1,3 @@
-//index.js
-
 import express from "express";
 import {
   useMultiFileAuthState,
@@ -173,6 +171,7 @@ app.post("/sendMessage", (req, res) => {
   async function handleMessage(m) {
     // console.log(m)
     if (m.isGroup) return;
+    if(m.text === undefined) return console.log(m.itself);
     await saveMessage(m);
     io.emit('recievedMessage',m)
   }
