@@ -14,7 +14,7 @@ app.use(cors()); // Apply CORS middleware here
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"], // Update this with your frontend URL
+        origin: ["http://localhost:8080"], // Update this with your frontend URL
         methods: ["GET", "POST"]
     }
 });

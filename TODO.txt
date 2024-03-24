@@ -15,3 +15,7 @@ https://e1.pxfuel.com/desktop-wallpaper/596/934/desktop-wallpaper-omen-valorant-
           {formattedTimeStamp}
         </div>
       </div>
+
+
+
+       npx tailwindcss -i ./frontend/src/index.css -o ./frontend/src/main.css && 

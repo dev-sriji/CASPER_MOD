@@ -15,7 +15,7 @@ const Messages = () => {
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
       }
-    }, 350);
+    }, 50);
   }, [messages]);
 
   return (

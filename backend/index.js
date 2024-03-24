@@ -11,14 +11,31 @@ import { connectToMongoDB } from "./db/connectToMongoDB.js";
 import Config from "./config.js";
 import cors from "cors";
 import {app, io, server} from './socketio/socket.js'
+import path from "path";
+const __dirname = path.resolve();
+const PORT = Config.PORT || 8080;
+import cfonts from "cfonts";
+
+
 app.use(express.json());
 app.use(cors());
+
+// Define the static middleware after defining the catch-all route
+// Define the static middleware before defining the catch-all route
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+// Define the catch-all route after the static middleware
+app.get("/app", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
+
+
+
 import Message from "./models/message-model.js";
 
-const PORT = Config.PORT || 8080;
 await server.listen(PORT, () => {
   connectToMongoDB();
-  console.log("Server Is Running On ", PORT);
+  console.log("Server Is Running On ", `http://localhost:${PORT}`.blue.underline.bold);
 });
 
 // Function to connect to WhatsApp
@@ -227,6 +244,22 @@ app.post("/sendMessage", (req, res) => {
             console.log("Error saving message to database:", error);
           }
         };
+
+
+        cfonts.say('Welcome|To|Casper|Reloaded!', {
+          font: '3d',              // define the font face
+          align: 'left',              // define text alignment
+          colors: ['redBright','cyan'],         // define all colors
+          background: 'transparent',  // define the background color, you can also use `backgroundColor` here as key
+          letterSpacing: 1,           // define letter spacing
+          lineHeight: 1,              // define the line height
+          space: true,                // define if the output text should have empty lines on top and on the bottom
+          maxLength: '0',             // define how many character can be on one line
+          gradient: false,            // define your two gradient colors
+          independentGradient: false, // define if you want to recalculate the gradient for each new line
+          transitionGradient: false,  // define if this is a transition between colors directly
+          env: 'node'                 // define the environment cfonts is being executed in
+        });
       }
       
       // Connect to WhatsApp when the server starts
