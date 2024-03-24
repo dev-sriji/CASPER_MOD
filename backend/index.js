@@ -1,6 +1,7 @@
 //index.js
 
 import express from "express";
+import * as colors from 'colors'
 import {
   useMultiFileAuthState,
   makeWASocket,
@@ -15,13 +16,13 @@ app.use(cors());
 import Message from "./models/message-model.js";
 
 const PORT = Config.PORT || 8080;
+await server.listen(PORT, () => {
+  connectToMongoDB();
+  console.log("Server Is Running On ", PORT);
+});
 
 // Function to connect to WhatsApp
 async function connectToWhatsApp() {
-  await server.listen(PORT, () => {
-    connectToMongoDB();
-    console.log("Server Is Running On ", PORT);
-  });
   const { state, saveCreds } = await useMultiFileAuthState("SRIJI-SESSIONS");
   const sock = makeWASocket({
     auth: state,
@@ -69,6 +70,8 @@ async function connectToWhatsApp() {
         messages[0]?.message?.extendedTextMessage?.text,
         key: messages[0]?.key?.id || "",
         fromMe: messages[0]?.key?.fromMe,
+        definedType: (messages[0]?.message?.conversation ||
+          messages[0]?.message?.extendedTextMessage?.text) ? 'textMessage' : messages[0]?.message?.stickerMessage ? 'stickerMessage' : messages[0]?.message?.imageMessage ? 'imageMessage' : messages[0]?.message?.videoMessage ? 'videoMessage' : messages[0]?.message?.audioMessage ? 'audioMessage' : messages[0]?.message?.editedMessage ? 'editedMessage' : messages[0]?.message?.viewOnceMessage ? 'viewOnceMessage' : messages[0]?.message?.viewOnceMessageV2 ? 'viewOnceMessageV2' : undefined,
         quoted: {
             log:
             messages[0].message?.extendedTextMessage?.contextInfo ||
@@ -173,19 +176,59 @@ app.post("/sendMessage", (req, res) => {
   async function handleMessage(m) {
     // console.log(m)
     if (m.isGroup) return;
-    await saveMessage(m);
-    io.emit('recievedMessage',m)
-  }
-  const saveMessage = async (messageData) => {
-    try {
-      const message = new Message(messageData);
-      await message.save();
-      console.log("Message saved successfully.");
-    } catch (error) {
-      console.log("Error saving message to database:", error);
-    }
-  };
-}
+    if(m.definedType === undefined) return console.log('UNDEFINED Message Type Found... LOGGING MESSAGE OBJ :\n'.underline.red, JSON.stringify(m.itself, null, 2).italic.yellow);
+    const separator = "--------------------------------------------------------";
+    const arrow = "➜";
+    const replyEmoji = "💬";
+    const senderEmoji = "👤";
+    const groupEmoji = "👥";
+    
+    // Log a text message with enhanced design
+    console.log(separator);
+    console.log(
+      `📩 A text message received from ${senderEmoji} ${m.sender?.green} in chat ${m.chat?.green} 📩\n`.bold
+      );
+      console.log("Name:".magenta, m.name?.red.bold);
+      console.log("Chat:".magenta, m.chat?.yellow);
+      console.log("Sender:".magenta, `${senderEmoji} ${m.sender?.yellow.italic}`);
+      console.log(
+        "Is Group:".magenta,
+        `${m.isGroup ? `${groupEmoji} Yes` : "No"}`.yellow
+        );
+        console.log("Is DM:".magenta, `${m.isDm ? "Yes" : "No"}`.yellow);
+        console.log("Message Type:".magenta, m.definedType?.yellow);
+        console.log("Text:".magenta, m.text?.cyan.bold || 'undefined'.red);
+        console.log("Key:".magenta, m.key?.yellow);
+        console.log("From Me:".magenta, `${m.fromMe ? "Yes" : "No"}`.yellow);
+        console.log("Quoted :".magenta, m.quoted ? "true".green : "false".red);
+        console.log(
+          m.quoted ? 
+          `Quoted Sender: ${senderEmoji} ${m.quoted.sender}`.magenta.yellow : ''
+          );
 
-// Connect to WhatsApp when the server starts
-connectToWhatsApp();
+          console.log("Tagged:".magenta, m.quoted?.tagged);
+          
+          // Design for Replying To section
+          if (m.replyingTo) {
+            console.log(`\t╰┈➤ ${replyEmoji} Replying To:`.bgYellow.black);
+            console.log(`\t${arrow} ❝ ${m.replyingTo?.cyan}❞`);
+          }
+          
+          console.log(separator);
+          await saveMessage(m);         
+          io.emit('recievedMessage',m)
+        }
+        const saveMessage = async (messageData) => {
+          try {
+            const message = new Message(messageData);
+            await message.save();
+            console.log("Message saved successfully :)".blue.italic.bold);
+          } catch (error) {
+            console.log("Error saving message to database:", error);
+          }
+        };
+      }
+      
+      // Connect to WhatsApp when the server starts
+      connectToWhatsApp();
+      
