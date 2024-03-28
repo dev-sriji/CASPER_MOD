@@ -15,7 +15,7 @@ import path from "path";
 const __dirname = path.resolve();
 const PORT = Config.PORT || 8080;
 import cfonts from "cfonts";
-
+import { downloadMediaMessage } from '@whiskeysockets/baileys'
 app.use(express.json());
 app.use(cors());
 
@@ -88,23 +88,24 @@ async function connectToWhatsApp() {
       fromMe: messages[0]?.key?.fromMe,
       definedType:
         messages[0]?.message?.conversation ||
-        messages[0]?.message?.extendedTextMessage?.text
+          messages[0]?.message?.extendedTextMessage?.text
           ? "textMessage"
           : messages[0]?.message?.stickerMessage
-          ? "stickerMessage"
-          : messages[0]?.message?.imageMessage
-          ? "imageMessage"
-          : messages[0]?.message?.videoMessage
-          ? "videoMessage"
-          : messages[0]?.message?.audioMessage
-          ? "audioMessage"
-          : messages[0]?.message?.editedMessage
-          ? "editedMessage"
-          : messages[0]?.message?.viewOnceMessage
-          ? "viewOnceMessage"
-          : messages[0]?.message?.viewOnceMessageV2
-          ? "viewOnceMessageV2"
-          : undefined,
+            ? "stickerMessage"
+            : messages[0]?.message?.imageMessage
+              ? "imageMessage"
+              : messages[0]?.message?.videoMessage
+                ? "videoMessage"
+                : messages[0]?.message?.audioMessage
+                  ? "audioMessage"
+                  : messages[0]?.message?.editedMessage
+                    ? "editedMessage"
+                    : messages[0]?.message?.viewOnceMessage
+                      ? "viewOnceMessage"
+                      : messages[0]?.message?.viewOnceMessageV2
+                        ? "viewOnceMessageV2"
+                        : undefined,
+                        base64: '',
       quoted: {
         log:
           messages[0].message?.extendedTextMessage?.contextInfo ||
@@ -123,14 +124,14 @@ async function connectToWhatsApp() {
       },
       replyingTo: messages[0]?.key?.remoteJid?.endsWith("@s.whatsapp.net")
         ? messages[0]?.message?.extendedTextMessage?.contextInfo?.quotedMessage
-            ?.conversation ||
-          messages[0].message?.extendedTextMessage?.contextInfo?.text ||
-          global?.db?.data?.users[messages[0]?.key?.remoteJid]?.lastReply ||
-          ""
+          ?.conversation ||
+        messages[0].message?.extendedTextMessage?.contextInfo?.text ||
+        global?.db?.data?.users[messages[0]?.key?.remoteJid]?.lastReply ||
+        ""
         : messages[0]?.message?.extendedTextMessage?.contextInfo?.quotedMessage
-            ?.conversation ||
-          messages[0].message?.extendedTextMessage?.contextInfo?.text ||
-          false,
+          ?.conversation ||
+        messages[0].message?.extendedTextMessage?.contextInfo?.text ||
+        false,
       itself: messages[0],
     };
     // console.log(m);
@@ -208,11 +209,50 @@ async function connectToWhatsApp() {
   async function handleMessage(m) {
     // console.log(m)
     if (m.isGroup) return;
-    if (m.definedType === undefined)
-      return console.log(
-        "UNDEFINED Message Type Found... LOGGING MESSAGE OBJ :\n".underline.red,
-        JSON.stringify(m.itself, null, 2).italic.yellow
-      );
+    if (m.definedType === undefined) return logUndefined(m)
+    logDefined(m)
+  switch(m.definedType){
+    case 'textMessage' :
+      await saveMessage(m);
+      break;
+    case 'imageMessage' :
+      await saveImageMessage(m)
+      break;
+
+  }
+    io.emit("recievedMessage", m);
+  }
+
+  const saveImageMessage = async (m) =>{
+    const buffer = await downloadMediaMessage(
+      m.itself,
+      'buffer',
+      { },
+      { 
+          reuploadRequest: sock.updateMediaMessage
+      }
+  )
+  const base64Image = await Buffer.from(await buffer).toString('base64');
+  // console.log(base64Image)
+  m.base64 =base64Image ;
+  await saveMessage(m)
+  }
+  const saveMessage = async (messageData) => {
+    try {
+      const message = new Message(messageData);
+      await message.save();
+      console.log("Message saved successfully :)".blue.italic.bold);
+    } catch (error) {
+      console.log("Error saving message to database:", error);
+    }
+  };
+  const logUndefined = async (m) => {
+    return console.log(
+      "UNDEFINED Message Type Found... LOGGING MESSAGE OBJ :\n".underline.red,
+      JSON.stringify(m.itself, null, 2).italic.yellow
+    );
+  }
+  const logDefined = async (m) => {
     const separator =
       "--------------------------------------------------------";
     const arrow = "➜";
@@ -252,21 +292,8 @@ async function connectToWhatsApp() {
       console.log(`\t╰┈➤ ${replyEmoji} Replying To:`.bgYellow.black);
       console.log(`\t${arrow} ❝ ${m.replyingTo?.cyan}❞`);
     }
-
     console.log(separator);
-    await saveMessage(m);
-    io.emit("recievedMessage", m);
   }
-  const saveMessage = async (messageData) => {
-    try {
-      const message = new Message(messageData);
-      await message.save();
-      console.log("Message saved successfully :)".blue.italic.bold);
-    } catch (error) {
-      console.log("Error saving message to database:", error);
-    }
-  };
-
   const randomFont = [
     "console",
     "block",

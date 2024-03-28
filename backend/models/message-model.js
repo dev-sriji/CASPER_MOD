@@ -10,6 +10,8 @@ const messageSchema = new mongoose.Schema({
     text: String,
     key: String,
     fromMe: Boolean,
+    definedType:String,
+    base64:String,
     quoted: {
         log: Object,
         text: String,
