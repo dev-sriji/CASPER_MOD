@@ -8,12 +8,12 @@ To use Casper Reloaded, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/dev-sriji/CASPER_MOD
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd Casper_Reloaded
+   cd CASPER_MOD
    ```
 
 3. Install dependencies:
