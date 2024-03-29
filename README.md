@@ -1,53 +1,48 @@
 # Casper Reloaded
 
-Casper Reloaded is a project that enables you to connect to WhatsApp, functioning as a clone with additional features such as viewing and replying to deleted messages, as well as viewing view-once messages.
+Casper Reloaded is a project that allows you to connect to WhatsApp, functioning as a clone with additional features such as viewing and replying to deleted messages, as well as viewing view-once messages.
 
 ## Installation
 
-### Clone the Repository
-```bash
-git clone <repository_url>
+To use Casper Reloaded, follow these steps:
 
-Navigate to the Project Directory
+1. Clone the repository:
+   ```bash
+   git clone <repository_url>
+   ```
 
-bash
+2. Navigate to the project directory:
+   ```bash
+   cd Casper_Reloaded
+   ```
 
-cd Casper_Reloaded
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Install Dependencies
+4. Build the project:
+   ```bash
+   npm run build
+   ```
 
-bash
-
-npm install
-
-Build the Project
-
-bash
-
-npm run build
-
-Usage
+## Usage
 
 Once the project is set up, you can run it using the following command:
-
-bash
-
+```bash
 npm start
+```
 
-Features
+## Features
 
-    Connect to WhatsApp and use it as a clone.
-    View and reply to deleted messages.
-    View view-once messages.
+- Connect to WhatsApp and use it as a clone.
+- View and reply to deleted messages.
+- View view-once messages.
 
-Contributing
+## Contributing
 
 Contributions are welcome! If you have any ideas for new features, improvements, or find any issues, please feel free to open an issue or submit a pull request.
-License
 
-This project is licensed under the MIT License.
+## License
 
-vbnet
-
-
-This markdown version with code blocks and headings should be easier to copy and paste into your project's README file. Feel free to adjust it further as needed!
+This project is licensed under the [MIT License](LICENSE).
