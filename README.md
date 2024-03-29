@@ -15,13 +15,8 @@ To use Casper Reloaded, follow these steps:
    ```bash
    cd CASPER_MOD
    ```
-
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-4. Build the project:
+   
+3. Install Dependencies & Build the project:
    ```bash
    npm run build
    ```
