@@ -1,3 +1,4 @@
+// Message.jsx
 import React from "react";
 import { extractTime } from "../../BearModule/extractTime";
 
@@ -37,6 +38,11 @@ const Message = ({ message }) => {
               src={`data:image/jpeg;base64,${base64}`}
               alt="Image"
             />
+            {messageText && (
+              <div className="text-xs text-gray-600 mt-1">
+                <b className="text-black">{messageText}</b>
+              </div>
+            )}
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
               <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download <span className="loading loading-ball loading-xs"></span></button>
             </div>
@@ -49,6 +55,11 @@ const Message = ({ message }) => {
               <source src={`data:video/mp4;base64,${base64}`} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
+            {messageText && (
+              <div className="text-xs text-gray-600 mt-1">
+                <b>{messageText}</b>
+              </div>
+            )}
           </div>
         );
       case "audioMessage":
@@ -71,7 +82,7 @@ const Message = ({ message }) => {
           <div className="chat-bubble bg-gray-200">
             <div className="badge badge-warning">
               ViewOnce Message
-              <span className="loading loading-ring loading-lg"></span>
+              <span className="loading loading-ring loading-lg text-error"></span>
             </div>
             {isImage && (
               <div>
@@ -107,7 +118,6 @@ const Message = ({ message }) => {
         return null;
     }
   };
-  
 
   return (
     <div className={`chat ${messageClassName}`}>

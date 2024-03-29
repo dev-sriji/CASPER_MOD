@@ -85,7 +85,11 @@ async function connectToWhatsApp() {
         : false,
       text:
         messages[0]?.message?.conversation ||
-        messages[0]?.message?.extendedTextMessage?.text,
+        messages[0]?.message?.extendedTextMessage?.text ||
+        messages[0]?.message?.imageMessage?.caption ||
+        messages[0]?.message?.videoMessage?.caption ||
+        messages[0]?.message?.viewOnceMessage?.caption ||
+        messages[0]?.message?.viewOnceMessageV2?.caption,
       key: messages[0]?.key?.id || "",
       fromMe: messages[0]?.key?.fromMe,
       definedType:
@@ -343,61 +347,79 @@ async function connectToWhatsApp() {
       console.log(`\t${arrow} ❝ ${m.replyingTo?.cyan}❞`);
     }
     console.log(separator);
+
   }
   const randomFont = [
-    "console",
     "block",
-    "simpleBlock",
-    "simple",
-    "3d",
-    "simple3d",
-    "chrome",
-    "huge",
-    "shade",
     "slick",
     "grid",
     "pallet",
-  ];
-  const validColors = [
-    "black",
-    "red",
-    "green",
-    "yellow",
-    "blue",
-    "magenta",
-    "cyan",
-    "white",
-    "gray",
-    "#3456ff",
-    "#f80",
-  ];
-  const additionalColors = ["#ff5733", "#33ff57", "#5733ff"];
+];
 
-  // Combine valid colors with additional colors
-  const allColors = validColors.concat(additionalColors);
+// Randomly select a font style and gradient colors
+setTimeout(() => {
+    const firstIndex = Math.floor(Math.random() * randomFont.length);
+    const selectedFont1 = randomFont[firstIndex];
 
-  // Randomly select a font style and gradient colors
-  const selectedFont =
-    randomFont[Math.floor(Math.random() * randomFont.length)];
-  const selectedColor1 =
-    allColors[Math.floor(Math.random() * allColors.length)];
-  const selectedColor2 =
-    allColors[Math.floor(Math.random() * allColors.length)];
+    // Remove the selected font from the array
+    const remainingFonts = randomFont.slice(0, firstIndex).concat(randomFont.slice(firstIndex + 1));
 
-  cfonts.say("Welcome|To|Casper|Reloaded!", {
-    font: selectedFont,
-    align: "left",
-    colors: ["white"],
-    background: "transparent",
-    letterSpacing: 1,
-    lineHeight: 1,
-    space: true,
-    maxLength: "0",
-    gradient: [selectedColor1, selectedColor2],
-    independentGradient: false,
-    transitionGradient: false,
-    env: "node",
-  });
+    const secondIndex = Math.floor(Math.random() * remainingFonts.length);
+    const selectedFont2 = remainingFonts[secondIndex];
+
+    cfonts.say("Welcome To|Casper Reloaded!", {
+        font: selectedFont1,
+        align: "center",
+        colors: ["white"],
+        background: "transparent",
+        letterSpacing: 1,
+        lineHeight: 1,
+        space: true,
+        maxLength: "0",
+        gradient: ["red", "magenta"],
+        independentGradient: false,
+        transitionGradient: false,
+        env: "node",
+    });
+
+    setTimeout(() => {
+        cfonts.say("Created By|Dev-SRIJI!", {
+            font: selectedFont2,
+            align: "center",
+            colors: ["white"],
+            background: "transparent",
+            letterSpacing: 1,
+            lineHeight: 1,
+            space: true,
+            maxLength: "0",
+            gradient: ["red", "magenta"],
+            independentGradient: false,
+            transitionGradient: false,
+            env: "node",
+        });
+
+        setTimeout(() => {
+            cfonts.say("GitHub : https://github.com/dev-sriji/", {
+                font: "console",
+                align: "left",
+                colors: ["white"],
+                background: "transparent",
+                letterSpacing: 1,
+                lineHeight: 1,
+                space: true,
+                maxLength: "0",
+                gradient: ["red", "magenta"],
+                independentGradient: false,
+                transitionGradient: false,
+                env: "node",
+            });
+        }, 2000);
+    }, 3000);
+}, 5000);
+
+
+
+ 
 }
 
 connectToWhatsApp();

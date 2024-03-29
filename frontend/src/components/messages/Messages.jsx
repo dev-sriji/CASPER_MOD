@@ -1,21 +1,22 @@
-//Messages.jsx
-
+// Messages.jsx
 import React, { useEffect, useRef } from "react";
-import Message from "./Message"; // Corrected the import path
+import Message from "./Message";
 import useGetMessages from "../../hooks/useGetMessage";
 import useRecievedMessages from "../../hooks/useRecievedMessages";
+import useChat from '../../BearModule/UseChat';
 
 const Messages = () => {
   const { messages, loading } = useGetMessages();
   const messagesEndRef = useRef(null);
-  useRecievedMessages();
+  const { selectedChat } = useChat();
+  useRecievedMessages(selectedChat);
 
   useEffect(() => {
     setTimeout(() => {
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
       }
-    }, 50);
+    }, 10);
   }, [messages]);
 
   return (
@@ -29,7 +30,12 @@ const Messages = () => {
         ))}
       <div ref={messagesEndRef} />
       {loading ? (
-        <span className="loading loading-bars loading-ig my-6 mx-auto"></span>
+        <div className="flex justify-center items-center h-screen">
+          <span className="loading loading-ball loading-xs text-info"></span>
+        <span className="loading loading-ball loading-sm text-success"></span>
+        <span className="loading loading-ball loading-md text-warning"></span>
+        <span className="loading loading-ball loading-lg text-error"></span>
+        </div>
       ) : null}
       {!loading && messages.length === 0 && (
         <p className="py-5 px-10">Send Messages To Start The Conversation</p>
