@@ -2834,6 +2834,10 @@ body {
     min-width: 90%;
   }
 
+  .md\:max-w-\[90\%\] {
+    max-width: 90%;
+  }
+
   .md\:text-7xl {
     font-size: 4.5rem;
     line-height: 1;
