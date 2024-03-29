@@ -25,7 +25,7 @@ const Message = ({ message }) => {
     switch (messageType2) {
       case "textMessage":
         return (
-          <div className={`chat-bubble ${bubbleColour} ${fromMe ? "text-blue-800" : "text-white"}`}>
+          <div className={`chat-bubble ${bubbleColour} ${fromMe ? "text-white" : "text-white"}`}>
             <b>{messageText}</b>
           </div>
         );
@@ -38,7 +38,7 @@ const Message = ({ message }) => {
               alt="Image"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
-              <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download</button>
+              <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download <span className="loading loading-ball loading-xs"></span></button>
             </div>
           </div>
         );
@@ -54,6 +54,7 @@ const Message = ({ message }) => {
       case "audioMessage":
         return (
           <div className="chat-bubble bg-gray-200">
+             <button onClick={handleDownload} className="badge badge-error gap-2">Click Here To Download <span className="loading loading-ball loading-xs"></span></button>
             <audio controls className="w-full">
               <source src={`data:audio/mpeg;base64,${base64}`} type="audio/mpeg" />
               Your browser does not support the audio tag.
@@ -79,7 +80,7 @@ const Message = ({ message }) => {
                   src={`data:image/jpeg;base64,${base64}`}
                   alt="View Once Image"
                 />
-                <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download</button>
+                <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download <span className="loading loading-ball loading-xs"></span></button>
               </div>
             )}
             {isVideo && (
@@ -88,12 +89,12 @@ const Message = ({ message }) => {
                   <source src={`data:video/mp4;base64,${base64}`} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
-                <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download</button>
+                <button onClick={handleDownload} className="text-white font-bold py-2 px-4 rounded-lg border bg-blue-500 hover:bg-blue-700">Download <span className="loading loading-ball loading-xs"></span></button>
               </div>
             )}
             {isAudio && (
               <div>
-                <button onClick={handleDownload} className="badge badge-error gap-2">Click Here To Download</button>
+                <button onClick={handleDownload} className="badge badge-error gap-2">Click Here To Download <span className="loading loading-ball loading-xs"></span></button>
                 <audio controls className="w-full py-4">
                   <source src={`data:audio/mpeg;base64,${base64}`} type="audio/mpeg" />
                   Your browser does not support the audio tag.

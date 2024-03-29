@@ -6,7 +6,7 @@ export const SideBar = () => {
   return (
     <div>
             <SearchInput />
-      <div className="divider px-3"></div>
+      <div className="divider px-3 min-w-[20%]"></div>
       <Chats />
     </div>
   );
