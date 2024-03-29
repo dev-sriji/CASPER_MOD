@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import http from 'http';
 import express from 'express'
 import Config from "../config.js";
+import * as colors from "colors";
 import cors from "cors";
 
 const PORT = Config.PORT || 8080;
@@ -20,8 +21,8 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-    console.log("ok 9340", socket.id)
-    
+    console.log("Socket Established On", socket.id)
+    console.log(`Server Is Running On `, `http://localhost:${PORT}`.red.bold.italic)
     socket.on("disconnect", () => {
         // Handle disconnect
     });
