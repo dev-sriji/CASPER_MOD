@@ -6,6 +6,8 @@ import {
   useMultiFileAuthState,
   makeWASocket,
   DisconnectReason,
+  downloadContentFromMessage,
+  generateWAMessage,
 } from "@whiskeysockets/baileys";
 import { connectToMongoDB } from "./db/connectToMongoDB.js";
 import Config from "./config.js";
@@ -103,9 +105,12 @@ async function connectToWhatsApp() {
                     : messages[0]?.message?.viewOnceMessage
                       ? "viewOnceMessage"
                       : messages[0]?.message?.viewOnceMessageV2
-                        ? "viewOnceMessageV2"
+                        ? "viewOnceMessageV2" 
+                        : messages[0]?.message?.viewOnceMessageV2Extension
+                          ? "viewOnceMessageV2Extension"
                         : undefined,
-                        base64: '',
+      voType: '',
+      base64: '',
       quoted: {
         log:
           messages[0].message?.extendedTextMessage?.contextInfo ||
@@ -211,31 +216,74 @@ async function connectToWhatsApp() {
     if (m.isGroup) return;
     if (m.definedType === undefined) return logUndefined(m)
     logDefined(m)
-  switch(m.definedType){
-    case 'textMessage' :
-      await saveMessage(m);
-      break;
-    case 'imageMessage' :
-      await saveImageMessage(m)
-      break;
+    switch (m.definedType) {
+      case 'textMessage':
+        // console.log(m.itself)
+        await saveMessage(m);
+        break;
+      case 'imageMessage':
+      case 'videoMessage': 
+      case 'audioMessage':
+        await saveImageMessage(m)
+        break;
+        case 'viewOnceMessageV2':
+          case 'viewOnceMessage':
+            case 'viewOnceMessageV2Extension':
+        handleVO(m)
+      // let msg = m.itself.message.viewOnceMessageV2.message
+      // console.log(msg)  
 
-  }
-    io.emit("recievedMessage", m);
+    }
+    
   }
 
-  const saveImageMessage = async (m) =>{
-    const buffer = await downloadMediaMessage(
-      m.itself,
-      'buffer',
-      { },
-      { 
-          reuploadRequest: sock.updateMediaMessage
+  const handleVO = async (m) => {
+    const viewOnce = await generateWAMessage(m.chat, {
+      forward: {
+        key: {
+          id: m.key.id,
+          remoteJid: m.chat
+        },
+        message: m?.itself?.message?.viewOnceMessageV2?.message || m?.itself?.message?.viewOnceMessageV2Extension?.message || {}
       }
-  )
-  const base64Image = await Buffer.from(await buffer).toString('base64');
-  // console.log(base64Image)
-  m.base64 =base64Image ;
-  await saveMessage(m)
+    },{})
+    // m.voType = (viewOnce?.message?.imageMessage?.mimetype?.startsWith('image/') === true) ? 'imageMessage' :
+    //        (viewOnce?.message?.videoMessage?.mimetype?.startsWith('video/') === true) ? 'videoMessage' :
+    //        (viewOnce?.message?.audioMessage?.mimetype?.startsWith('audio/') === true) ? 'audioMessage' :
+    //        'unknownMessage';
+    m.voType = viewOnce?.message?.imageMessage?.mimetype || viewOnce?.message?.videoMessage?.mimetype || viewOnce?.message?.audioMessage?.mimetype ;
+
+// console.log(m.voType);
+
+    const buffer = await downloadMediaMessage(
+      viewOnce,
+      'buffer',
+      {},
+      {
+        reuploadRequest: sock.updateMediaMessage,
+        logger:''
+      }
+    )
+    
+      const base64Image = await Buffer.from(await buffer).toString('base64');
+    // console.log(base64Image)
+    m.base64 = await base64Image ;
+    m.definedType ='viewOnceMessage'
+    await saveMessage(m)
+  }
+  const saveImageMessage = async (m) => {
+    const buffer = await downloadMediaMessage(
+      m.itself, 
+      'buffer',
+      {},
+      {
+        reuploadRequest: sock.updateMediaMessage
+      }
+    )
+    const base64Image = await Buffer.from(await buffer).toString('base64');
+    // console.log(base64Image)
+    m.base64 = await base64Image;
+    await saveMessage(m)
   }
   const saveMessage = async (messageData) => {
     try {
@@ -244,7 +292,9 @@ async function connectToWhatsApp() {
       console.log("Message saved successfully :)".blue.italic.bold);
     } catch (error) {
       console.log("Error saving message to database:", error);
-    }
+    } finally {
+    io.emit("recievedMessage", messageData);
+  }
   };
   const logUndefined = async (m) => {
     return console.log(
