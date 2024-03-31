@@ -10,17 +10,19 @@ import {
   generateWAMessage,
 } from "@whiskeysockets/baileys";
 import { connectToMongoDB } from "./db/connectToMongoDB.js";
-import Config from "./config.js";
+import dotenv from 'dotenv';
+dotenv.config()
 import cors from "cors";
 import { app, io, server } from "./socketio/socket.js";
 import path from "path";
 const __dirname = path.resolve();
-const PORT = Config.PORT || 8080;
+const PORT = process.env.PORT || 8080;
 import cfonts from "cfonts";
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 app.use(express.json());
 app.use(cors());
-
+import pino from "pino";
+import https from 'https'
 // Define the static middleware after defining the catch-all route
 // Define the static middleware before defining the catch-all route
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
@@ -31,6 +33,7 @@ app.get("/app", (req, res) => {
 });
 
 import Message from "./models/message-model.js";
+import Profile from "./models/profile-info-model.js";
 
 await server.listen(PORT, () => {
   connectToMongoDB();
@@ -46,6 +49,7 @@ async function connectToWhatsApp() {
   const sock = makeWASocket({
     auth: state,
     printQRInTerminal: true,
+    logger: pino({ level: 'debug' }),
   });
 
   sock.ev.on("connection.update", async (update) => {
@@ -109,10 +113,10 @@ async function connectToWhatsApp() {
                     : messages[0]?.message?.viewOnceMessage
                       ? "viewOnceMessage"
                       : messages[0]?.message?.viewOnceMessageV2
-                        ? "viewOnceMessageV2" 
+                        ? "viewOnceMessageV2"
                         : messages[0]?.message?.viewOnceMessageV2Extension
                           ? "viewOnceMessageV2Extension"
-                        : undefined,
+                          : undefined,
       voType: '',
       base64: '',
       quoted: {
@@ -143,15 +147,54 @@ async function connectToWhatsApp() {
         false,
       itself: messages[0],
     };
+
+    createNewProfile(m.chat, m.isDm ? 'DM' : m.isGroup ? 'GP' : undefined, m.fromMe ? undefined : m.name)
     // console.log(m);
     handleMessage(m);
   });
 
+  async function createNewProfile(id, type, name) {
+    if (!type) return;
+
+    try {
+      // Assuming Profile is a Mongoose model
+      const user = await Profile.findOne({ id: id });
+      if (user) return; // If user already exists, return
+
+      // Fetch additional information
+      const about = await sock.fetchStatus(id).status;
+      const ppUrl = await sock.profilePictureUrl(id, 'image');
+      const imageData = await downloadImage(ppUrl);
+
+      // Convert image data to base64
+      const base64Image = Buffer.from(imageData).toString('base64');
+
+      // Create new profile object
+      const newProfile = new Profile({
+        name,
+        id,
+        about,
+        dps: [base64Image], // Assuming dps is an array of base64 images
+        type
+      });
+
+      // Save the new profile to the database
+      await newProfile.save();
+
+      // console.log('New profile created:', newProfile);
+    } catch (error) {
+      // console.error('Error handling user Profile:', error);
+      console.log("Error handling user Profile ... Contact Developer If it repeats".red.bold);
+    }
+  }
+
   app.post("/sendMessage", (req, res) => {
     try {
-      const chat = req.body.chat || Config.MODS;
+
+      //TODO: add debugger for this ->> using if the number exists function in baileys
+      const chat = req.body.chat || process.env.MODS;
       const text = req.body.payload.text || "";
-      sock.sendMessage(chat || Config.MODS, { text: text });
+      sock.sendMessage(chat || process.env?.MODS  , { text: text });
       // console.log(req.body)
       res.status(200).json({ reciever: chat, text: text });
       // res.status(200).json({ data: "everything ok" });
@@ -226,19 +269,19 @@ async function connectToWhatsApp() {
         await saveMessage(m);
         break;
       case 'imageMessage':
-      case 'videoMessage': 
+      case 'videoMessage':
       case 'audioMessage':
         await saveImageMessage(m)
         break;
-        case 'viewOnceMessageV2':
-          case 'viewOnceMessage':
-            case 'viewOnceMessageV2Extension':
+      case 'viewOnceMessageV2':
+      case 'viewOnceMessage':
+      case 'viewOnceMessageV2Extension':
         handleVO(m)
       // let msg = m.itself.message.viewOnceMessageV2.message
       // console.log(msg)  
 
     }
-    
+
   }
 
   const handleVO = async (m) => {
@@ -250,14 +293,14 @@ async function connectToWhatsApp() {
         },
         message: m?.itself?.message?.viewOnceMessageV2?.message || m?.itself?.message?.viewOnceMessageV2Extension?.message || {}
       }
-    },{})
+    }, {})
     // m.voType = (viewOnce?.message?.imageMessage?.mimetype?.startsWith('image/') === true) ? 'imageMessage' :
     //        (viewOnce?.message?.videoMessage?.mimetype?.startsWith('video/') === true) ? 'videoMessage' :
     //        (viewOnce?.message?.audioMessage?.mimetype?.startsWith('audio/') === true) ? 'audioMessage' :
     //        'unknownMessage';
-    m.voType = viewOnce?.message?.imageMessage?.mimetype || viewOnce?.message?.videoMessage?.mimetype || viewOnce?.message?.audioMessage?.mimetype ;
+    m.voType = viewOnce?.message?.imageMessage?.mimetype || viewOnce?.message?.videoMessage?.mimetype || viewOnce?.message?.audioMessage?.mimetype;
 
-// console.log(m.voType);
+    // console.log(m.voType);
 
     const buffer = await downloadMediaMessage(
       viewOnce,
@@ -265,19 +308,19 @@ async function connectToWhatsApp() {
       {},
       {
         reuploadRequest: sock.updateMediaMessage,
-        logger:''
+        logger: ''
       }
     )
-    
-      const base64Image = await Buffer.from(await buffer).toString('base64');
+
+    const base64Image = await Buffer.from(await buffer).toString('base64');
     // console.log(base64Image)
-    m.base64 = await base64Image ;
-    m.definedType ='viewOnceMessage'
+    m.base64 = await base64Image;
+    m.definedType = 'viewOnceMessage'
     await saveMessage(m)
   }
   const saveImageMessage = async (m) => {
     const buffer = await downloadMediaMessage(
-      m.itself, 
+      m.itself,
       'buffer',
       {},
       {
@@ -297,8 +340,8 @@ async function connectToWhatsApp() {
     } catch (error) {
       console.log("Error saving message to database:", error);
     } finally {
-    io.emit("recievedMessage", messageData);
-  }
+      io.emit("recievedMessage", messageData);
+    }
   };
   const logUndefined = async (m) => {
     return console.log(
@@ -354,10 +397,10 @@ async function connectToWhatsApp() {
     "slick",
     "grid",
     "pallet",
-];
+  ];
 
-// Randomly select a font style and gradient colors
-setTimeout(() => {
+  // Randomly select a font style and gradient colors
+  setTimeout(() => {
     const firstIndex = Math.floor(Math.random() * randomFont.length);
     const selectedFont1 = randomFont[firstIndex];
 
@@ -368,7 +411,23 @@ setTimeout(() => {
     const selectedFont2 = remainingFonts[secondIndex];
 
     cfonts.say("Welcome To|Casper Reloaded!", {
-        font: selectedFont1,
+      font: selectedFont1,
+      align: "center",
+      colors: ["white"],
+      background: "transparent",
+      letterSpacing: 1,
+      lineHeight: 1,
+      space: true,
+      maxLength: "0",
+      gradient: ["red", "magenta"],
+      independentGradient: false,
+      transitionGradient: false,
+      env: "node",
+    });
+
+    setTimeout(() => {
+      cfonts.say("Created By|Dev-SRIJI!", {
+        font: selectedFont2,
         align: "center",
         colors: ["white"],
         background: "transparent",
@@ -380,46 +439,90 @@ setTimeout(() => {
         independentGradient: false,
         transitionGradient: false,
         env: "node",
-    });
+      });
 
-    setTimeout(() => {
-        cfonts.say("Created By|Dev-SRIJI!", {
-            font: selectedFont2,
-            align: "center",
-            colors: ["white"],
-            background: "transparent",
-            letterSpacing: 1,
-            lineHeight: 1,
-            space: true,
-            maxLength: "0",
-            gradient: ["red", "magenta"],
-            independentGradient: false,
-            transitionGradient: false,
-            env: "node",
+      setTimeout(() => {
+        cfonts.say("GitHub : https://github.com/dev-sriji/", {
+          font: "console",
+          align: "left",
+          colors: ["white"],
+          background: "transparent",
+          letterSpacing: 1,
+          lineHeight: 1,
+          space: true,
+          maxLength: "0",
+          gradient: ["red", "magenta"],
+          independentGradient: false,
+          transitionGradient: false,
+          env: "node",
+        });
+      }, 2000);
+    }, 3000);
+  }, 5000);
+
+
+  // sock.ev.on('contacts.update', async (data) => {
+  sock.ws.on(`CB:notification`, async (node) => {
+    console.log(node?.content[0])
+    // async function saveProfilePictureOfUser(idUser) {
+    //   try {
+    //     const ppUrl = await sock.profilePictureUrl(idUser, 'image');
+    //     const imageData = await downloadImage(ppUrl); // Corrected to await
+    //     const base64Image = Buffer.from(imageData).toString('base64');
+    //     await addDpsToUser(idUser, base64Image); // Corrected to await
+    //   } catch (error) {
+    //     console.error('Error handling user profile:', error);
+    //     console.log("Error handling user profile... Contact Developer If it repeats".red.bold);
+    //   }
+    // }
+  })
+
+
+  function downloadImage(url) {
+    return new Promise((resolve, reject) => {
+      https.get(url, function (response) {
+        let node = Buffer.alloc(0); // Initialize an empty buffer
+
+        response.on('node', chunk => {
+          node = Buffer.concat([node, chunk]); // Append each chunk to the buffer
         });
 
-        setTimeout(() => {
-            cfonts.say("GitHub : https://github.com/dev-sriji/", {
-                font: "console",
-                align: "left",
-                colors: ["white"],
-                background: "transparent",
-                letterSpacing: 1,
-                lineHeight: 1,
-                space: true,
-                maxLength: "0",
-                gradient: ["red", "magenta"],
-                independentGradient: false,
-                transitionGradient: false,
-                env: "node",
-            });
-        }, 2000);
-    }, 3000);
-}, 5000);
+        response.on('end', () => {
+          console.log('Image download complete');
+          resolve(node); // Resolve the promise with the complete image node
+        });
+      }).on('error', error => {
+        console.error('Error downloading image:', error);
+        reject(error); // Reject the promise if there's an error
+      });
+    });
+  }
+
+  // async function addDpsToUser(id, imgData) {
+  //   try {
+  //     // console.log('Updating user with ID:', id);
+  //     // console.log('Image node:', imgData);
+
+  //     // Find the user by ID and update the 'dps' array
+  //     const updatedUser = await Profile.findOneAndUpdate(
+  //       { id: id },
+  //       { $push: { dps: imgData } },
+  //       { new: true }
+  //     );
+
+  //     if (!updatedUser) {
+  //       console.error('User not found');
+  //       return; // Handle the case where the user is not found
+  //     }
+
+  //     console.log('Dps added to user:', updatedUser);
+  //   } catch (error) {
+  //     console.error('Error adding dps to user:', error);
+  //     console.log("Error adding dps to user... Contact Developer If it repeats".red.bold);
+  //   }
+  // }
 
 
-
- 
 }
 
 connectToWhatsApp();
