@@ -228,7 +228,6 @@ async function connectToWhatsApp() {
       res.status(500).json({ error: "Something Went Wrong" });
     }
   });
-  / Adjust the delay as needed  
 
   app.get("/getUsers", async (req, res) => {
     try {
