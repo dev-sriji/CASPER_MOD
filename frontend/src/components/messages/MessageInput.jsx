@@ -8,14 +8,14 @@ const MessageInput = () => {
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
-
+  
   // Example tags
-  const exampleTags = ["@everyone", "@here", "#general", "#random"];
-
+  const tagoptions = ["@Everyone", "#HideTag", "#ManualTag","@TagAdmins","@TagMe"];
+  
   // Radio options
-  const radioOptions = ["Option 1", "Option 2", "Option 3"];
+  const radioOptions = ["NormalMessage", "Payload", "ImageFormUrl","YouTubeVideoFromUrl"];
+  const [selectedOption, setSelectedOption] = useState(radioOptions[0]);
   
   const handleTagInput = (e) => {
     setTagInput(e.target.value);
@@ -78,7 +78,7 @@ const MessageInput = () => {
         <div className="collapse bg-base-200">
           <input type="checkbox" id="toggleContent" className="toggle" />
           <label htmlFor="toggleContent" className="collapse-title text-xl font-medium cursor-pointer">
-          <kbd className="kbd">Click Hre To Show/Hide More Options</kbd>
+          <b>Click Hre To Show/Hide More Options</b>
           </label>
           <div className="collapse-content"> 
             <div className="mb-2 px-5" style={{ display: "flex", flexDirection: "row" }}>
@@ -109,7 +109,7 @@ const MessageInput = () => {
                   onChange={(e) => handleTagSelect(e.target.value)}
                 >
                   <option value="">Select Tag...</option>
-                  {exampleTags.map((tag, index) => (
+                  {tagoptions.map((tag, index) => (
                     <option key={index} value={tag}>
                       {tag}
                     </option>

@@ -209,21 +209,26 @@ async function connectToWhatsApp() {
       if (!requestedChat) {
         return res.status(400).json({ error: "chat parameter is missing" });
       }
-
-      const mess = await Message.find({ chat: requestedChat }).sort({
-        updatedAt: 1,
-      }).limit(20);
-
+  
+      const mess = await Message.find({ chat: requestedChat })
+        .sort({ updatedAt: -1 }) // Sort in descending order by updatedAt
+        .limit(20); // Limit to the last 20 messages
+  
       if (!mess || mess.length === 0) {
         return res.status(200).json({});
       }
-
-      res.status(200).json({ message: mess });
+  
+      // Reverse the order of messages
+      const reversedMessages = mess.reverse();
+  
+      res.status(200).json({ message: reversedMessages });
     } catch (error) {
       console.error("Error occurred:", error);
       res.status(500).json({ error: "Something Went Wrong" });
     }
   });
+  
+  
 
   app.get("/getUsers", async (req, res) => {
     try {
