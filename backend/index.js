@@ -212,7 +212,7 @@ async function connectToWhatsApp() {
 
       const mess = await Message.find({ chat: requestedChat }).sort({
         updatedAt: 1,
-      });
+      }).limit(20);
 
       if (!mess || mess.length === 0) {
         return res.status(200).json({});
@@ -223,9 +223,7 @@ async function connectToWhatsApp() {
       console.error("Error occurred:", error);
       res.status(500).json({ error: "Something Went Wrong" });
     }
-  }); 
-
-
+  });
 
   app.get("/getUsers", async (req, res) => {
     try {
