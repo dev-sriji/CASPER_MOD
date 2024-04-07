@@ -11,10 +11,10 @@ const MessageInput = () => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
   
   // Example tags
-  const tagoptions = ["@Everyone", "#HideTag", "#ManualTag","@TagAdmins","@TagMe"];
+  const tagoptions = ["@eo", "#ht", "#mt","@ta","#rm"];    //TODO :   ,"@tm"
   
   // Radio options
-  const radioOptions = ["NormalMessage", "Payload", "ImageFormUrl","YouTubeVideoFromUrl"];
+  const radioOptions = ["NormalMessage", "Payload(Coming Soon)"];
   const [selectedOption, setSelectedOption] = useState(radioOptions[0]);
   
   const handleTagInput = (e) => {
@@ -23,9 +23,12 @@ const MessageInput = () => {
 
   const handleAddTag = () => {
     if (tagInput.trim() === "") return;
-    setTags([...tags, tagInput.trim()]);
+    if (!tags.includes(tagInput.trim())) { // Check if tag already exists
+      setTags([...tags, tagInput.trim()]);
+    }
     setTagInput("");
   };
+  
 
   const handleRemoveTag = (index) => {
     setTags(tags.filter((_, i) => i !== index));
@@ -52,7 +55,7 @@ const MessageInput = () => {
     setMessage("");
     setTags([]);
     setSelectedTag("");
-    setSelectedOption("");
+    setSelectedOption(radioOptions[0]);
   };
 
   return (
@@ -78,7 +81,7 @@ const MessageInput = () => {
         <div className="collapse bg-base-200">
           <input type="checkbox" id="toggleContent" className="toggle" />
           <label htmlFor="toggleContent" className="collapse-title text-xl font-medium cursor-pointer">
-          <b>Click Hre To Show/Hide More Options</b>
+          <b>Click Here To Show/Hide More Options</b>
           </label>
           <div className="collapse-content"> 
             <div className="mb-2 px-5" style={{ display: "flex", flexDirection: "row" }}>
@@ -108,11 +111,18 @@ const MessageInput = () => {
                   value={selectedTag}
                   onChange={(e) => handleTagSelect(e.target.value)}
                 >
-                  <option value="">Select Tag...</option>
-                  {tagoptions.map((tag, index) => (
-                    <option key={index} value={tag}>
-                      {tag}
-                    </option>
+                    {/* const tagoptions = ["@eo", "#ht", "#mt","@ta","@tm","#rm"]; */}
+
+                    <option value="">Select Tag...</option>
+      {tagoptions.map((tag, index) => (
+        <option key={index} value={tag}>
+          {tag.replace('@eo', 'Everyone')
+              .replace('#ht', 'Hide Tag (Coming Soon)')
+              .replace('#mt', 'Manual Tag')
+              .replace('@ta', 'Tag Admin')
+              .replace('@tm', 'Tag Me')
+              .replace('#rm', 'Read More')}
+        </option>
                   ))}
                 </select>
               </label>
@@ -125,7 +135,12 @@ const MessageInput = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-4 h-4 stroke-current">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                    {tag}
+                    {tag.replace('@eo', 'Everyone (Use @eo in chat)')
+              .replace('#ht', 'Hide Tag (Coming Soon)') // Use #ht in chat
+              .replace('#mt', 'Manual Tag (Use #mt in chat)')
+              .replace('@ta', 'Tag Admins (Use @ta In Chat)')
+              .replace('@tm', 'Tag Me (Use @tm in chat)')
+              .replace('#rm', 'Read More (use #rm in Chat)')}
                     <button type="button" onClick={() => handleRemoveTag(index)} className="ml-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M14.061 5.635a.5.5 0 0 0-.707 0l-1.414 1.414a.5.5 0 1 0 .707.707l1.414-1.414a.5.5 0 0 0 0-.707zM10 3a1 1 0 0 0-1 1v1H5a1 1 0 0 0 0 2h1v1a1 1 0 0 0 2 0V7h1a1 1 0 0 0 0-2H8V4a1 1 0 0 0-1-1z"/>
