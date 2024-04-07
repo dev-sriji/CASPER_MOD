@@ -11,10 +11,10 @@ const MessageInput = () => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
   
   // Example tags
-  const tagoptions = ["@eo", "#ht", "#mt","@ta","#rm"];    //TODO :   ,"@tm"
+  const tagoptions = ["@eo", "#ht", "#mt","@ta","#rm","bl"];    //TODO :   ,"@tm"
   
   // Radio options
-  const radioOptions = ["NormalMessage", "Payload(Coming Soon)"];
+  const radioOptions = ["NormalMessage", "LoadingMessage" , "Payload(Coming Soon)"];
   const [selectedOption, setSelectedOption] = useState(radioOptions[0]);
   
   const handleTagInput = (e) => {
@@ -23,7 +23,7 @@ const MessageInput = () => {
 
   const handleAddTag = () => {
     if (tagInput.trim() === "") return;
-    if (!tags.includes(tagInput.trim())) { // Check if tag already exists
+    if (!tags.includes(tagInput.trim())) { 
       setTags([...tags, tagInput.trim()]);
     }
     setTagInput("");
@@ -50,7 +50,8 @@ const MessageInput = () => {
       tags: tags,
       radioOption: selectedOption,
     };
-    if (!m.text) return;
+    if (!m.text && !(m?.tags?.includes('bl'))) return;
+    m.text = m.text || ""
     await sendMessage(m);
     setMessage("");
     setTags([]);
@@ -121,6 +122,7 @@ const MessageInput = () => {
               .replace('#mt', 'Manual Tag')
               .replace('@ta', 'Tag Admin')
               .replace('@tm', 'Tag Me')
+              .replace('bl', 'Blank Message')
               .replace('#rm', 'Read More')}
         </option>
                   ))}
@@ -140,6 +142,7 @@ const MessageInput = () => {
               .replace('#mt', 'Manual Tag (Use #mt in chat)')
               .replace('@ta', 'Tag Admins (Use @ta In Chat)')
               .replace('@tm', 'Tag Me (Use @tm in chat)')
+              .replace('bl', 'Blank Text')
               .replace('#rm', 'Read More (use #rm in Chat)')}
                     <button type="button" onClick={() => handleRemoveTag(index)} className="ml-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
