@@ -206,24 +206,29 @@ async function connectToWhatsApp() {
   app.post("/getMessages", async (req, res) => {
     try {
       const requestedChat = req.body.chat;
+      const page = parseInt(req.body.page) || 1; // default page is 1
+      const pageSize = 20; // number of messages per page
+  
       if (!requestedChat) {
         return res.status(400).json({ error: "chat parameter is missing" });
       }
-
-      const mess = await Message.find({ chat: requestedChat }).sort({
-        updatedAt: 1,
-      });
-
+  
+      const mess = await Message.find({ chat: requestedChat })
+        .sort({ updatedAt: 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+  
       if (!mess || mess.length === 0) {
         return res.status(200).json({});
       }
-
+  
       res.status(200).json({ message: mess });
     } catch (error) {
       console.error("Error occurred:", error);
       res.status(500).json({ error: "Something Went Wrong" });
     }
   });
+  / Adjust the delay as needed  
 
   app.get("/getUsers", async (req, res) => {
     try {

@@ -1,3 +1,5 @@
+//sidebar.jsx
+
 import React from "react";
 import SearchInput from "./SearchInput";
 import Chats from "./Chats";
@@ -6,7 +8,7 @@ export const SideBar = () => {
   return (
     <div>
             <SearchInput />
-      <div className="divider px-3 min-w-[20%]"></div>
+      <div className="min-w-[80%] flex flex-col"></div>
       <Chats />
     </div>
   );

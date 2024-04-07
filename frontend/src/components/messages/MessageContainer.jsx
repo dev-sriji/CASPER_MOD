@@ -4,17 +4,16 @@ import React from 'react'
 import Messages from './Messages'
 import MessageInput from './MessageInput'
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
-
-
+import useChat from "../../BearModule/UseChat";
 const MessageContainer = () => {
-    const noChatSeclected = false; 
+  const { selectedChat } = useChat();
   return (
       <div className="min-w-[80%] flex flex-col">
-            {noChatSeclected ? 
-            <div className="flex items-center justify-center  w-full h-full">
-                <div className="px-4 text-center  sm:text-lg md:text-xl text-gray-200 font-semibold flex flex-col items-center gap-2">
-<p>WELCOME TO CASPER-WHATSAPP CLONE...</p>
-<p>Support Developer : <button className="btn btn-outline btn-accent"><a href='https://github.com/dev-sriji'>GitHub</a></button> </p>
+            {!selectedChat ? 
+            <div className="flex py-10 items-center justify-center  w-full h-full">
+                <div className="px-4 py-10 text-center  sm:text-lg md:text-xl text-gray-200 font-semibold flex flex-col items-center gap-2">
+<b className='py-5'>WELCOME TO CASPER-WHATSAPP CLONE...</b>
+<p className='py-5'>Support Developer : <button className="btn btn-outline btn-accent"><a href='https://github.com/dev-sriji'>GitHub<span className="loading loading-ring loading-xs text-error"></span></a></button> </p>
                 <IoChatboxEllipsesOutline className='text-3xl md:text-7xl text-center'/>
                 </div>
             </div>
